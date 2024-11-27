@@ -1,39 +1,84 @@
+from algorithms.fifo import FIFOReplacement
+from algorithms.lfu import LFUReplacement
+from algorithms.lru import LRUReplacement
+from algorithms.optimal import OptimalReplacement
+from utils.memory_visualization import display_memory_state
 from models.page import Page
 import sys
 
-def parse_input(file_path):
-    try:
-        with open(file_path, 'r') as file:
-            lines = file.readlines()
-            if len(lines) < 2:
-                raise ValueError("Input file must contain at least two lines: page references and number of frames.")
-            
-            page_references = list(map(int, lines[0].strip().split()))
-            num_frames = int(lines[1].strip())
-            
+def get_page_references():
+    while True:
+        try:
+            input_str = input("Enter page reference sequence (space-separated integers): ")
+            page_references = list(map(int, input_str.strip().split()))
+            if not page_references:
+                print("Page reference sequence cannot be empty.")
+                continue
+            return page_references
+        except ValueError:
+            print("Invalid input. Please enter space-separated integers.")
+
+def get_num_frames():
+    while True:
+        try:
+            num_frames = int(input("Enter the number of frames: "))
             if num_frames <= 0:
-                raise ValueError("Number of frames must be a positive integer.")
-            
-            return page_references, num_frames
-    except FileNotFoundError:
-        print(f"Error: File '{file_path}' not found.")
-        sys.exit(1)
-    except ValueError as ve:
-        print(f"Input Error: {ve}")
-        sys.exit(1)
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        sys.exit(1)
+                print("Number of frames must be a positive integer.")
+                continue
+            return num_frames
+        except ValueError:
+            print("Invalid input. Please enter a positive integer.")
+
+def select_algorithm():
+    algorithms = {
+        '1': ('FIFO', FIFOReplacement),
+        '2': ('LRU', LRUReplacement),
+        '3': ('LFU', LFUReplacement),
+        '4': ('Optimal', OptimalReplacement)
+    }
+    
+    print("\nSelect Page Replacement Algorithm:")
+    for key, (name, _) in algorithms.items():
+        print(f"{key}. {name}")
+    
+    while True:
+        choice = input("Enter your choice (1-4): ")
+        if choice in algorithms:
+            return algorithms[choice]
+        else:
+            print("Invalid choice. Please select a valid option.")
+
+def display_statistics(stats):
+    print("\n--- Performance Statistics ---")
+    print(f"Page Hits: {stats['page_hits']}")
+    print(f"Page Faults: {stats['page_faults']}")
+    print(f"Hit Percentage: {stats['hit_percentage']:.2f}%")
+    print(f"Fault Percentage: {stats['fault_percentage']:.2f}%")
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python main.py <input_file>")
-        sys.exit(1)
+    print("=== Memory Management Simulator ===")
     
-    input_file = sys.argv[1]
-    page_references, num_frames = parse_input(input_file)
+    page_references = get_page_references()
+    num_frames = get_num_frames()
     
-    # Proceed with simulation using page_references and num_frames
+    algorithm_name, AlgorithmClass = select_algorithm()
+    print(f"\nSelected Algorithm: {algorithm_name}")
+    
+    if algorithm_name == 'Optimal':
+        replacement = AlgorithmClass(num_frames, page_references)
+    else:
+        replacement = AlgorithmClass(num_frames)
+    
+    for page_number in page_references:
+        replacement.access_page(page_number)
+        display_memory_state(replacement.frames)
+    
+    stats = replacement.get_statistics()
+    display_statistics(stats)
+    
+    print("\n--- Replacement Log ---")
+    for log_entry in replacement.get_replacement_log():
+        print(log_entry)
 
 if __name__ == "__main__":
     main()
