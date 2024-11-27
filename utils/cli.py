@@ -5,16 +5,29 @@ from algorithms.lru import LRUReplacement
 from algorithms.optimal import OptimalReplacement
 
 def get_page_references() -> List[int]:
+    """
+    Prompts the user to provide a file containing the page reference sequence.
+    Parses the file to extract a list of page references.
+
+    Returns:
+        List[int]: A list of page reference integers.
+    """
     while True:
+        file_path = input("Enter the path to the page reference file: ").strip()
         try:
-            input_str = input("Enter page reference sequence (space-separated integers): ")
-            page_references = list(map(int, input_str.strip().split()))
-            if not page_references:
-                print("Page reference sequence cannot be empty.")
-                continue
-            return page_references
+            with open(file_path, 'r') as file:
+                content = file.read()
+                page_references = list(map(int, content.strip().split()))
+                if not page_references:
+                    print("Page reference file is empty.")
+                    continue
+                return page_references
+        except FileNotFoundError:
+            print(f"File not found: {file_path}. Please provide a valid file path.")
         except ValueError:
-            print("Invalid input. Please enter space-separated integers.")
+            print("Invalid file format. Ensure the file contains space-separated integers.")
+        except Exception as e:
+            print(f"An error occurred while reading the file: {e}")
 
 def get_num_frames() -> int:
     while True:
