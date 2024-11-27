@@ -1,5 +1,6 @@
 from typing import List
 from models.page import Page
+from tabulate import tabulate
 
 def display_memory_state(frames: List[Page]):
     """
@@ -9,9 +10,12 @@ def display_memory_state(frames: List[Page]):
         frames (List[Page]): A list of Page objects currently in physical memory.
     """
     if not frames:
-        print("Physical Memory is empty.")
+        print("Physical Memory is currently empty.\n")
         return
     
-    memory_representation = " | ".join(f"Page {page.page_number}" for page in frames)
-    print(f"Physical Memory State: [{memory_representation}]")
-    print("-" * (len(memory_representation) + 25))
+    table = [["Frame", "Page Number"]]
+    for idx, page in enumerate(frames, start=1):
+        table.append([f"Frame {idx}", page.page_number])
+    
+    print("\nCurrent Physical Memory State:")
+    print(tabulate(table, headers="firstrow", tablefmt="grid"))
