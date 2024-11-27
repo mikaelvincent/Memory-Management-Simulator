@@ -4,7 +4,8 @@ from models.page import Page
 class FIFOReplacement:
     def __init__(self, num_frames):
         self.num_frames = num_frames
-        self.frames = deque()
+        self.frames = [None] * self.num_frames  # Fixed frame list
+        self.queue = deque()
         self.page_map = {}
         self.page_hits = 0
         self.page_faults = 0
@@ -17,16 +18,20 @@ class FIFOReplacement:
         else:
             self.page_faults += 1
             new_page = Page(page_number=page_number)
-            if len(self.frames) < self.num_frames:
-                self.frames.append(new_page)
+            if None in self.frames:
+                frame_index = self.frames.index(None)
+                self.frames[frame_index] = new_page
                 self.page_map[page_number] = new_page
-                self.replacement_log.append(f"Loaded page {page_number} into physical memory.")
+                self.queue.append(frame_index)
+                self.replacement_log.append(f"Loaded page {page_number} into Frame {frame_index + 1}.")
             else:
-                oldest_page = self.frames.popleft()
+                oldest_frame_index = self.queue.popleft()
+                oldest_page = self.frames[oldest_frame_index]
                 del self.page_map[oldest_page.page_number]
-                self.replacement_log.append(f"Replaced page {oldest_page.page_number} with page {page_number}.")
-                self.frames.append(new_page)
+                self.replacement_log.append(f"Replaced page {oldest_page.page_number} with page {page_number} in Frame {oldest_frame_index + 1}.")
+                self.frames[oldest_frame_index] = new_page
                 self.page_map[page_number] = new_page
+                self.queue.append(oldest_frame_index)
 
     def get_statistics(self):
         total_accesses = self.page_hits + self.page_faults
