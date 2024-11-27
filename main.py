@@ -3,6 +3,7 @@ from algorithms.lfu import LFUReplacement
 from algorithms.lru import LRUReplacement
 from algorithms.optimal import OptimalReplacement
 from utils.memory_visualization import display_memory_state
+from utils.statistics import StatisticsAggregator
 from models.page import Page
 import sys
 
@@ -29,7 +30,7 @@ def get_num_frames():
         except ValueError:
             print("Invalid input. Please enter a positive integer.")
 
-def select_algorithm():
+def select_algorithms():
     algorithms = {
         '1': ('FIFO', FIFOReplacement),
         '2': ('LRU', LRUReplacement),
@@ -37,23 +38,29 @@ def select_algorithm():
         '4': ('Optimal', OptimalReplacement)
     }
     
-    print("\nSelect Page Replacement Algorithm:")
+    print("\nSelect Page Replacement Algorithms (separated by commas, e.g., 1,3):")
     for key, (name, _) in algorithms.items():
         print(f"{key}. {name}")
     
+    selected = set()
     while True:
-        choice = input("Enter your choice (1-4): ")
-        if choice in algorithms:
-            return algorithms[choice]
+        choices = input("Enter your choices: ").split(',')
+        valid = True
+        for choice in choices:
+            choice = choice.strip()
+            if choice not in algorithms:
+                print(f"Invalid choice: {choice}. Please select valid options.")
+                valid = False
+                break
+            selected.add(algorithms[choice][0])
+        if valid and selected:
+            break
         else:
-            print("Invalid choice. Please select a valid option.")
+            selected.clear()
+    return [(name, cls) for key, (name, cls) in algorithms.items() if name in selected]
 
-def display_statistics(stats):
-    print("\n--- Performance Statistics ---")
-    print(f"Page Hits: {stats['page_hits']}")
-    print(f"Page Faults: {stats['page_faults']}")
-    print(f"Hit Percentage: {stats['hit_percentage']:.2f}%")
-    print(f"Fault Percentage: {stats['fault_percentage']:.2f}%")
+def display_statistics(stats_aggregator: StatisticsAggregator):
+    stats_aggregator.display_summary()
 
 def main():
     print("=== Memory Management Simulator ===")
@@ -61,24 +68,29 @@ def main():
     page_references = get_page_references()
     num_frames = get_num_frames()
     
-    algorithm_name, AlgorithmClass = select_algorithm()
-    print(f"\nSelected Algorithm: {algorithm_name}")
+    selected_algorithms = select_algorithms()
+    stats_aggregator = StatisticsAggregator()
     
-    if algorithm_name == 'Optimal':
-        replacement = AlgorithmClass(num_frames, page_references)
-    else:
-        replacement = AlgorithmClass(num_frames)
+    for algorithm_name, AlgorithmClass in selected_algorithms:
+        print(f"\n--- Running {algorithm_name} Algorithm ---")
+        if algorithm_name == 'Optimal':
+            replacement = AlgorithmClass(num_frames, page_references)
+        else:
+            replacement = AlgorithmClass(num_frames)
+        
+        for page_number in page_references:
+            replacement.access_page(page_number)
+            display_memory_state(replacement.frames)
+        
+        stats = replacement.get_statistics()
+        stats_aggregator.add_statistics(algorithm_name, stats)
+        display_statistics(stats)
+        
+        print("\n--- Replacement Log ---")
+        for log_entry in replacement.get_replacement_log():
+            print(log_entry)
     
-    for page_number in page_references:
-        replacement.access_page(page_number)
-        display_memory_state(replacement.frames)
-    
-    stats = replacement.get_statistics()
-    display_statistics(stats)
-    
-    print("\n--- Replacement Log ---")
-    for log_entry in replacement.get_replacement_log():
-        print(log_entry)
+    display_statistics(stats_aggregator)
 
 if __name__ == "__main__":
     main()
