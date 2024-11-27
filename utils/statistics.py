@@ -1,4 +1,5 @@
 from typing import Dict, List
+from tabulate import tabulate
 
 class StatisticsAggregator:
     """
@@ -22,12 +23,19 @@ class StatisticsAggregator:
         Displays a summary of performance metrics for all algorithms.
         """
         if not self.algorithm_stats:
-            print("No statistics to display.")
+            print("No statistics available to display.\n")
             return
 
-        print("\n=== Summary of Performance Metrics ===")
-        print(f"{'Algorithm':<10} | {'Hits':<5} | {'Faults':<7} | {'Hit%':<6} | {'Fault%':<7}")
-        print("-" * 45)
+        table = [["Algorithm", "Hits", "Faults", "Hit Percentage (%)", "Fault Percentage (%)"]]
         for algo, stats in self.algorithm_stats.items():
-            print(f"{algo:<10} | {stats['page_hits']:<5} | {stats['page_faults']:<7} | "
-                  f"{stats['hit_percentage']:<6.2f} | {stats['fault_percentage']:<7.2f}")
+            table.append([
+                algo,
+                stats['page_hits'],
+                stats['page_faults'],
+                f"{stats['hit_percentage']:.2f}",
+                f"{stats['fault_percentage']:.2f}"
+            ])
+        
+        print("\n=== Performance Metrics Summary ===")
+        print(tabulate(table, headers="firstrow", tablefmt="grid"))
+        print()
