@@ -9,13 +9,10 @@ def display_memory_state(frames: List[Page]):
     Args:
         frames (List[Page]): A list of Page objects currently in physical memory.
     """
-    if not frames:
-        print("Physical Memory is currently empty.\n")
-        return
-    
     table = [["Frame", "Page Number"]]
     for idx, page in enumerate(frames, start=1):
-        table.append([f"Frame {idx}", page.page_number])
+        page_number = page.page_number if page else ""
+        table.append([f"Frame {idx}", page_number])
     
     print("\nCurrent Physical Memory State:")
-    print(tabulate(table, headers="firstrow", tablefmt="grid"))
+    print(tabulate(table, headers="firstrow", tablefmt="grid", colalign=("left", "right")))
