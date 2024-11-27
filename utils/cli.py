@@ -49,7 +49,7 @@ def select_algorithms() -> List[Tuple[str, object]]:
         '4': ('Optimal', OptimalReplacement)
     }
     
-    print("\nSelect Page Replacement Algorithms (separated by commas, e.g., 1,3):")
+    print("\nSelect Page Replacement Algorithms (separated by commas, e.g., 1, 3):")
     for key, (name, _) in algorithms.items():
         print(f"{key}. {name}")
     
