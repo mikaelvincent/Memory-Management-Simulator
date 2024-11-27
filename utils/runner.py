@@ -12,7 +12,11 @@ def run_algorithms(selected_algorithms: List[Tuple[str, object]], num_frames: in
         
         for page_number in page_references:
             replacement.access_page(page_number)
-            display_memory_state(replacement.frames)
+            if isinstance(replacement.frames, dict):
+                frames = list(replacement.frames.values())
+            else:
+                frames = list(replacement.frames)
+            display_memory_state(frames)
         
         stats = replacement.get_statistics()
         stats_aggregator.add_statistics(algorithm_name, stats)
