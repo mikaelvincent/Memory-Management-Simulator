@@ -3,6 +3,7 @@ from algorithms.fifo import FIFOReplacement
 from algorithms.lfu import LFUReplacement
 from algorithms.lru import LRUReplacement
 from algorithms.optimal import OptimalReplacement
+from tabulate import tabulate
 
 def get_page_references() -> List[int]:
     """
@@ -13,32 +14,32 @@ def get_page_references() -> List[int]:
         List[int]: A list of page reference integers.
     """
     while True:
-        file_path = input("Enter the path to the page reference file: ").strip()
+        file_path = input("Please enter the path to the page reference file: ").strip()
         try:
             with open(file_path, 'r') as file:
                 content = file.read()
                 page_references = list(map(int, content.strip().split()))
                 if not page_references:
-                    print("Page reference file is empty.")
+                    print("Error: The page reference file is empty.")
                     continue
                 return page_references
         except FileNotFoundError:
-            print(f"File not found: {file_path}. Please provide a valid file path.")
+            print(f"Error: File not found at '{file_path}'. Please provide a valid file path.")
         except ValueError:
-            print("Invalid file format. Ensure the file contains space-separated integers.")
+            print("Error: Invalid file format. Ensure the file contains space-separated integers.")
         except Exception as e:
-            print(f"An error occurred while reading the file: {e}")
+            print(f"An unexpected error occurred while reading the file: {e}")
 
 def get_num_frames() -> int:
     while True:
         try:
-            num_frames = int(input("Enter the number of frames: "))
+            num_frames = int(input("Please enter the number of frames: "))
             if num_frames <= 0:
-                print("Number of frames must be a positive integer.")
+                print("Error: Number of frames must be a positive integer.")
                 continue
             return num_frames
         except ValueError:
-            print("Invalid input. Please enter a positive integer.")
+            print("Error: Invalid input. Please enter a positive integer.")
 
 def select_algorithms() -> List[Tuple[str, object]]:
     algorithms = {
@@ -59,7 +60,7 @@ def select_algorithms() -> List[Tuple[str, object]]:
         for choice in choices:
             choice = choice.strip()
             if choice not in algorithms:
-                print(f"Invalid choice: {choice}. Please select valid options.")
+                print(f"Error: Invalid choice '{choice}'. Please select valid options.")
                 valid = False
                 break
             selected.add(algorithms[choice][0])
