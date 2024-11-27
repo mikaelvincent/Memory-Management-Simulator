@@ -84,7 +84,7 @@ def main():
         
         stats = replacement.get_statistics()
         stats_aggregator.add_statistics(algorithm_name, stats)
-        display_statistics(stats)
+        display_statistics(stats_aggregator)
         
         print("\n--- Replacement Log ---")
         for log_entry in replacement.get_replacement_log():
