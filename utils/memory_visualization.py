@@ -11,8 +11,8 @@ def display_memory_state(frames: List[Page]):
     """
     table = [["Frame", "Page Number"]]
     for idx, page in enumerate(frames, start=1):
-        page_number = page.page_number if page else " "
+        page_number = page.page_number if page else ""
         table.append([f"Frame {idx}", page_number])
     
     print("\nCurrent Physical Memory State:")
-    print(tabulate(table, headers="firstrow", tablefmt="grid"))
+    print(tabulate(table, headers="firstrow", tablefmt="grid", colalign=("left", "right")))
