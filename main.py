@@ -3,7 +3,7 @@ from utils.runner import run_algorithms
 from utils.statistics import StatisticsAggregator
 
 def main():
-    print("=== Memory Management Simulator ===")
+    print("=== Memory Management Simulator ===\n")
     
     page_references = get_page_references()
     num_frames = get_num_frames()
