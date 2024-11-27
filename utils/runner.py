@@ -4,7 +4,7 @@ from utils.statistics import StatisticsAggregator
 
 def run_algorithms(selected_algorithms: List[Tuple[str, object]], num_frames: int, page_references: List[int], stats_aggregator: StatisticsAggregator):
     for algorithm_name, AlgorithmClass in selected_algorithms:
-        print(f"\n--- Running {algorithm_name} Algorithm ---")
+        print(f"\n\n--- Running {algorithm_name} Algorithm ---")
         if algorithm_name == 'Optimal':
             replacement = AlgorithmClass(num_frames, page_references)
         else:
@@ -24,3 +24,4 @@ def run_algorithms(selected_algorithms: List[Tuple[str, object]], num_frames: in
         print("\n--- Replacement Log ---")
         for log_entry in replacement.get_replacement_log():
             print(log_entry)
+    print()
